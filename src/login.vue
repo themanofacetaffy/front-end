@@ -2,6 +2,7 @@
 import {ref} from 'vue'
 import {AddUser} from '@/api/user'
 // do not use same name with ref
+const isRegister=ref(true)
 const LoginForm = ref({
   name: '',
   stuNum:'',
@@ -9,9 +10,17 @@ const LoginForm = ref({
   validation:'',
   password:''
 })
+const changeStatus = function (){
+  if(isRegister.value){
+    isRegister.value=false
+  }else{
+    isRegister.value=true
+  }
+}
 
 const onSubmit = async () => {
     await AddUser(LoginForm.value)
+  isRegister.value = false
 }
 
 //顶栏
@@ -38,7 +47,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
         />首页
       </el-menu-item>
 
-        <el-menu-item index="1" style="color: white;font-size: large">班级</el-menu-item>
+        <el-menu-item index="1" style="color: white;font-size: large" >班级</el-menu-item>
         <el-sub-menu index="2" style="color: white;font-size: large">
           <template #title >
             <span style="color: white;font-size: large">个人空间</span>
@@ -59,7 +68,8 @@ const handleSelect = (key: string, keyPath: string[]) => {
 
     </el-menu>
   </div>
-  <div class="form-container">
+  <!-- 注册表单 -->
+  <div class="form-container" v-if="isRegister===true">
     <el-form :model="form" label-width="auto" style="max-width: 600px">
       <el-form-item label="姓名">
         <el-input v-model="LoginForm.name" />
@@ -75,7 +85,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
       </el-form-item>
       <div class="validationCode">
         <el-form-item >
-          <el-input placeholder="请输入验证码" v-model="LoginForm.PhoneNumber" />
+          <el-input placeholder="请输入验证码" v-model="LoginForm.validation" />
         </el-form-item>
         <el-button type="primary">获取验证码</el-button>
       </div>
@@ -83,12 +93,30 @@ const handleSelect = (key: string, keyPath: string[]) => {
       <div class="button">
         <el-form-item >
           <el-button type="primary" @click="onSubmit">注册</el-button>
-          <el-button>取消</el-button>
+          <el-button @click="changeStatus">取消</el-button>
         </el-form-item>
       </div>
 
     </el-form>
     </div>
+
+  <!-- 登录表单 -->
+  <div class="form-container" v-else>
+    <el-form label-width="auto" style="max-width: 600px">
+      <el-form-item label="手机号">
+        <el-input placeholder="请输入手机号" v-model="LoginForm.stuNum"/>
+      </el-form-item>
+      <el-form-item label="密码">
+        <el-input placeholder="请输入密码" type="password" v-model="LoginForm.password"/>
+      </el-form-item>
+      <div class="button">
+        <el-form-item>
+          <el-button type="primary">登录</el-button>
+          <el-button @click="changeStatus">注册</el-button>
+        </el-form-item>
+      </div>
+    </el-form>
+  </div>
 </template>
 <style scoped >
 .form-container {
