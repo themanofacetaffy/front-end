@@ -1,11 +1,11 @@
 <script setup>
 
-import buttonVue from './button.vue'
-import  loginVue from './login.vue'
+import Menu from "@/menu.vue";
 </script>
 
 <template>
-<login-vue/>
+  <Menu/>
+  <router-view/>
 </template>
 
 <style scoped>

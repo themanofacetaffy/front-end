@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import {AddUser} from '@/api/user'
+import {useRouter} from "vue-router";
+const router = useRouter()
 // do not use same name with ref
 const isRegister=ref(true)
 const LoginForm = ref({
@@ -11,80 +13,61 @@ const LoginForm = ref({
   password:''
 })
 const changeStatus = function (){
-  if(isRegister.value){
-    isRegister.value=false
-  }else{
-    isRegister.value=true
-  }
+  isRegister.value = !isRegister.value;
 }
 
 const onSubmit = async () => {
     await AddUser(LoginForm.value)
   isRegister.value = false
 }
+const login = async () => {
 
-//顶栏
-const activeIndex = ref('1')
-const handleSelect = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
+   await router.push('/')
+}
+
+const rules = {
+  name: [
+    { required: true, message: '请输入姓名', trigger: 'blur' },
+    { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+  ],
+  stuNum: [
+    { required: true, message: '请输入学号', trigger: 'blur' },
+    { min: 11, max:11 , message: '学号长度为11位', trigger: 'blur' }
+  ],
+  PhoneNumber: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { min: 11, max:11 , message: '手机号长度为11位', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 15, message: '密码长度在6到15位之间', trigger: 'blur' }
+  ],
+  validation: [
+    { required: true, message: '请输入验证码', trigger: 'blur' },
+    { min: 4, max: 4, message: '验证码长度为4位', trigger: 'blur' }
+  ]
 }
 </script>
 
 <template>
-  <div class="menu">
-    <el-menu
-        :default-active="activeIndex"
-        class="el-menu-demo"
-        mode="horizontal"
-        :ellipsis="false"
-        @select="handleSelect"
-    >
-      <el-menu-item index="0" style="color: white;font-size: large">
-        <img
-            style="width: 50px "
-            src="./imag/42554166b2816bb449fbfbf97eeed380.png"
-            alt="小菲"
-        />首页
-      </el-menu-item>
 
-        <el-menu-item index="1" style="color: white;font-size: large" >班级</el-menu-item>
-        <el-sub-menu index="2" style="color: white;font-size: large">
-          <template #title >
-            <span style="color: white;font-size: large">个人空间</span>
-          </template>
-          <el-menu-item index="2-1">创建班级</el-menu-item>
-          <el-menu-item index="2-2">发起签到</el-menu-item>
-          <el-menu-item index="2-3">签到</el-menu-item>
-          <el-sub-menu index="2-4">
-            <template #title>
-              <span style="color: white;font-size: large"></span>
-            </template>
-            <el-menu-item index="2-4-1">item one</el-menu-item>
-            <el-menu-item index="2-4-2">item two</el-menu-item>
-            <el-menu-item index="2-4-3">item three</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-
-
-    </el-menu>
-  </div>
   <!-- 注册表单 -->
   <div class="form-container" v-if="isRegister===true">
-    <el-form :model="form" label-width="auto" style="max-width: 600px">
-      <el-form-item label="姓名">
+    <el-form :model="form" label-width="auto" style="max-width: 600px" :rules="rules">
+      <el-form-item label="姓名"  prop="name">
         <el-input v-model="LoginForm.name" />
       </el-form-item>
-      <el-form-item label="学号">
+      <el-form-item label="学号" :rules="rules" prop="stuNum">
         <el-input v-model="LoginForm.stuNum" />
       </el-form-item>
-      <el-form-item label="密码">
+      <el-form-item label="密码" :rules="rules" prop="password">
         <el-input v-model="LoginForm.password" />
       </el-form-item>
-      <el-form-item label="手机号">
+      <el-form-item label="手机号" :rules="rules" prop="PhoneNumber">
         <el-input v-model="LoginForm.PhoneNumber" />
       </el-form-item>
       <div class="validationCode">
-        <el-form-item >
+        <el-form-item  :rules="rules" prop="validation">
           <el-input placeholder="请输入验证码" v-model="LoginForm.validation" />
         </el-form-item>
         <el-button type="primary">获取验证码</el-button>
@@ -104,14 +87,14 @@ const handleSelect = (key: string, keyPath: string[]) => {
   <div class="form-container" v-else>
     <el-form label-width="auto" style="max-width: 600px">
       <el-form-item label="手机号">
-        <el-input placeholder="请输入手机号" v-model="LoginForm.stuNum"/>
+        <el-input placeholder="请输入手机号" v-model="LoginForm.PhoneNumber"/>
       </el-form-item>
       <el-form-item label="密码">
         <el-input placeholder="请输入密码" type="password" v-model="LoginForm.password"/>
       </el-form-item>
       <div class="button">
         <el-form-item>
-          <el-button type="primary">登录</el-button>
+          <el-button type="primary" @click="login">登录</el-button>
           <el-button @click="changeStatus">注册</el-button>
         </el-form-item>
       </div>
@@ -119,6 +102,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
   </div>
 </template>
 <style scoped >
+
 .form-container {
   display: flex;
   justify-content: center; /* 水平居中 */
@@ -134,6 +118,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 可选：添加阴影 */
   background-color: #fff; /* 可选：设置背景颜色 */
 }
+
 .validationCode{
   display: flex;
   justify-content: flex-end;
@@ -142,13 +127,8 @@ const handleSelect = (key: string, keyPath: string[]) => {
   display: flex;
   justify-content: center;
 }
-.el-menu--horizontal > .el-menu-item:nth-child(1) {
-  margin-right: auto;
-}
-.el-menu-demo{
-  background-color: #242424;
-  height: 75px;
-}
+
+
 
 </style>
 
