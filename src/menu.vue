@@ -24,7 +24,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
         />首页
       </el-menu-item>
 
-      <el-menu-item index="1" style="color: white;font-size: large" >管理班级</el-menu-item>
+      <el-menu-item index="1" style="color: white;font-size: large" >个人空间</el-menu-item>
       <el-sub-menu index="2" style="color: white;font-size: large">
         <template #title >
           <span style="color: white;font-size: large">个人空间</span>

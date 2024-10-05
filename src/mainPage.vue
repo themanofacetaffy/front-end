@@ -1,46 +1,41 @@
 <script setup>
-const handleClick = () => {
-  console.log('click')
-}
+import {GetUser,AddPoint,MinusPoint} from "@/api/user.js";
+import {CallTheRoll,undo_call_events,random_call} from "@/api/class.js";
 
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Home',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    state: 'California',
-    city: 'Los Angeles',
-    address: 'No. 189, Grove St, Los Angeles',
-    zip: 'CA 90036',
-    tag: 'Office',
-  },
-]
+import {ref} from 'vue'
+const stuTable = ref([])
+const class_id = ref({
+  class_id:'1',
+  deadline:'',
+  call_event_name:'第一次点名'
+})
+const random_call_data = ref({
+  class_id:'',
+  class_number:'',
+  deadline:'',
+  call_event_name:'随机抽点'
+})
+
+const GetStu =  async function (){
+  stuTable.value =await GetUser()
+}
+GetStu();
+
+const CalltheRoll = async function (){
+  await CallTheRoll(class_id.value)
+}
+const Undo_call_events = async function (){
+  await undo_call_events(class_id.value.class_id)
+}
+const Random_call = async function (){
+  await random_call(random_call_data.value)
+}
+const addPoint = async function (){
+  await AddPoint()
+}
+const minusPoint = async function (){
+  await MinusPoint()
+}
 </script>
 
 <template>
@@ -48,26 +43,24 @@ const tableData = [
     <el-container>
       <el-main>
         <div class="buttons">
-          <el-button type="primary">查看所有学生</el-button>
-          <el-button type="primary">发起签到</el-button>
-          <el-button type="primary">查看签到记录</el-button>
-          <el-button type="primary">发起随机提问</el-button>
+          <el-button type="primary" @click="GetStu">查看所有学生</el-button>
+          <el-button type="primary" @click="CalltheRoll">发起签到</el-button>
+          <el-button type="primary" @click="Undo_call_events">查看签到记录</el-button>
+          <el-button type="primary" @click="Random_call">发起随机提问</el-button>
 
         </div>
         <hr>
-        <el-table :data="tableData" style="width: 100%" border>
-          <el-table-column fixed prop="date" label="Date" width="150" />
-          <el-table-column prop="name" label="Name" width="120" />
-          <el-table-column prop="state" label="State" width="120" />
-          <el-table-column prop="city" label="City" width="120" />
-          <el-table-column prop="address" label="Address" width="600" />
-          <el-table-column prop="zip" label="Zip" width="120" />
+        <el-table :data="stuTable" style="width: 100%;height: 100vh" border>
+          <el-table-column prop="name" label="姓名" width="120" />
+          <el-table-column prop="Class" label="班级" width="120" />
+          <el-table-column prop="stuNum" label="学号" width="120" />
+          <el-table-column prop="status" label="状态" width="600" />
           <el-table-column fixed="right" label="Operations" min-width="120">
             <template #default>
-              <el-button link type="primary" size="small" @click="handleClick">
+              <el-button link type="primary" size="small" @click="addPoint">
                 加分
               </el-button>
-              <el-button link type="primary" size="small">减分</el-button>
+              <el-button link type="primary" size="small" @click="minusPoint">减分</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -77,6 +70,14 @@ const tableData = [
   </div>
 </template>
 <style scoped>
+.common-layout {
+  padding: 0;
+  margin: 0;
+}
 
+.el-container, .el-main {
+  padding: 0;
+  margin: 0;
+}
 
 </style>

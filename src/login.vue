@@ -12,17 +12,23 @@ const LoginForm = ref({
   validation:'',
   password:''
 })
+const radio1 = ref('1')//作为学生还是老师的判断
+
 const changeStatus = function (){
   isRegister.value = !isRegister.value;
 }
 
 const onSubmit = async () => {
-    await AddUser(LoginForm.value)
+  await AddUser(LoginForm.value)
   isRegister.value = false
 }
 const login = async () => {
+  if(radio1.value==='1'){
+    await router.push('/stu')
+  }else{
+    await router.push('/tea')
+  }
 
-   await router.push('/')
 }
 
 const rules = {
@@ -53,24 +59,33 @@ const rules = {
 
   <!-- 注册表单 -->
   <div class="form-container" v-if="isRegister===true">
-    <el-form :model="form" label-width="auto" style="max-width: 600px" :rules="rules">
+    <el-form :model="LoginForm" label-width="auto" style="max-width: 600px" :rules="rules">
       <el-form-item label="姓名"  prop="name">
         <el-input v-model="LoginForm.name" />
       </el-form-item>
-      <el-form-item label="学号" :rules="rules" prop="stuNum">
+      <el-form-item label="学号/工号" prop="stuNum">
         <el-input v-model="LoginForm.stuNum" />
       </el-form-item>
-      <el-form-item label="密码" :rules="rules" prop="password">
+      <el-form-item label="密码" prop="password">
         <el-input v-model="LoginForm.password" />
       </el-form-item>
-      <el-form-item label="手机号" :rules="rules" prop="PhoneNumber">
+      <el-form-item label="手机号" prop="PhoneNumber">
         <el-input v-model="LoginForm.PhoneNumber" />
       </el-form-item>
-      <div class="validationCode">
-        <el-form-item  :rules="rules" prop="validation">
-          <el-input placeholder="请输入验证码" v-model="LoginForm.validation" />
-        </el-form-item>
-        <el-button type="primary">获取验证码</el-button>
+      <div class="option">
+        <div class="radio-group">
+          <el-radio-group v-model="radio1">
+            <el-radio value="1" size="large" border>我是学生</el-radio>
+            <el-radio value="2" size="large" border>我是教师</el-radio>
+          </el-radio-group>
+        </div>
+
+        <div class="validationCode">
+          <el-form-item prop="validation">
+            <el-input placeholder="请输入验证码" v-model="LoginForm.validation" />
+          </el-form-item>
+          <el-button type="primary">获取验证码</el-button>
+        </div>
       </div>
 
       <div class="button">
@@ -81,7 +96,7 @@ const rules = {
       </div>
 
     </el-form>
-    </div>
+  </div>
 
   <!-- 登录表单 -->
   <div class="form-container" v-else>
@@ -92,6 +107,12 @@ const rules = {
       <el-form-item label="密码">
         <el-input placeholder="请输入密码" type="password" v-model="LoginForm.password"/>
       </el-form-item>
+      <div class="radio-group">
+        <el-radio-group v-model="radio1">
+          <el-radio value="1" size="large" border>我是学生</el-radio>
+          <el-radio value="2" size="large" border>我是教师</el-radio>
+        </el-radio-group>
+      </div>
       <div class="button">
         <el-form-item>
           <el-button type="primary" @click="login">登录</el-button>
@@ -101,7 +122,8 @@ const rules = {
     </el-form>
   </div>
 </template>
-<style scoped >
+
+<style scoped>
 
 .form-container {
   display: flex;
@@ -111,7 +133,7 @@ const rules = {
 }
 
 .el-form {
-  width: 300px; /* 设置表单的固定宽度 */
+  width: 350px; /* 增加表单的宽度 */
   padding: 20px; /* 添加一些内边距 */
   border: 1px solid #ccc; /* 添加边框 */
   border-radius: 10px; /* 添加圆角 */
@@ -119,16 +141,25 @@ const rules = {
   background-color: #fff; /* 可选：设置背景颜色 */
 }
 
-.validationCode{
-  display: flex;
-  justify-content: flex-end;
-}
-.button{
-  display: flex;
-  justify-content: center;
+.validationCode {
+  display: flex; /* 使验证码输入框和按钮有适当的间距 */ /* 垂直居中 */
+  margin-top: 10px;
 }
 
+.radio-group {
+  display: flex;
+  margin-bottom: 10px; /* 为单选按钮组增加一些底部间距 */
+}
 
+.button {
+  display: flex;
+  justify-content: space-around; /* 调整按钮的间距 */
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 增加选项之间的间距 */
+}
 
 </style>
-
