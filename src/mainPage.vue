@@ -1,11 +1,11 @@
 <script setup>
-import {GetUser,AddPoint,MinusPoint} from "@/api/user.js";
+import {GetUser, AddPoint, MinusPoint, GetUserList} from "@/api/user.js";
 import {CallTheRoll,undo_call_events,random_call} from "@/api/class.js";
 
 import {ref} from 'vue'
-const stuTable = ref([])
+const stuTable = ref({})
 const class_id = ref({
-  class_id:'1',
+  class_id:'',
   deadline:'',
   call_event_name:'第一次点名'
 })
@@ -17,12 +17,12 @@ const random_call_data = ref({
 })
 
 const GetStu =  async function (){
-  stuTable.value =await GetUser()
+  stuTable.value =await GetUserList()
 }
 GetStu();
 
 const CalltheRoll = async function (){
-  await CallTheRoll(class_id.value)
+  let res =await CallTheRoll(class_id.value)
 }
 const Undo_call_events = async function (){
   await undo_call_events(class_id.value.class_id)
@@ -50,7 +50,7 @@ const minusPoint = async function (){
 
         </div>
         <hr>
-        <el-table :data="stuTable" style="width: 100%;height: 100vh" border>
+        <el-table :data="stuTable.value" style="width: 100%;height: 100vh" border>
           <el-table-column prop="name" label="姓名" width="120" />
           <el-table-column prop="Class" label="班级" width="120" />
           <el-table-column prop="stuNum" label="学号" width="120" />

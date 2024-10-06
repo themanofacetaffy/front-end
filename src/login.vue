@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
-import {AddUser} from '@/api/user'
+import {AddUser,Login} from '@/api/user'
 import {useRouter} from "vue-router";
+import {UseTokenStore} from '@/stores/token.js'
+//const tokenStore = UseTokenStore()
 const router = useRouter()
 // do not use same name with ref
 const isRegister=ref(true)
@@ -23,6 +25,8 @@ const onSubmit = async () => {
   isRegister.value = false
 }
 const login = async () => {
+  //let res = await Login()
+  //tokenStore.setToken(res.data.token)
   if(radio1.value==='1'){
     await router.push('/stu')
   }else{

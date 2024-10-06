@@ -1,41 +1,31 @@
 import axios from "axios";
-export async function AddUser(user) {
-    return await axios.post("/api/user/register",user)
-        .then(res=>{
-        return console.log("注册成功")
-    }).catch(err=>{
-        return console.log(err)
-        })
+import request from "@/utils/request.js";
+export async function AddUser(users) {
+    const params = new URLSearchParams();
+    for(let key in users){
+        params.append(key,users[key])
+    }
+    return await request.post('/class/addusers',user)
 }
-export async function GetUser() {
-    return await axios.get("/api/class/auth/student-list")
-        .then(res=>{
-        return res.data
-    }).catch(err=>{
-        return console.log(err)
-        })
+export async function AddUsers(users) {
+    return await request.post('/class/adduser',user)
+}
+export async function GetUserList() {
+    return await request.get('/class/auth/student-list')
 }
 export async function AddPoint() {
-    return await axios.get("/api/class/auth/student-list")
-        .then(res=>{
-        return console.log("加分成功")
-    }).catch(err=>{
-        return console.log(err)
-        })
+    return await request.get('/user/addpoint')
 }
 export async function MinusPoint() {
-    return await axios.get("/api/class/auth/student-list")
-        .then(res=>{
-        return console.log("减分成功")
-    }).catch(err=>{
-        return console.log(err)
-        })
+    return await request.get('/user/minuspoint')
 }
-export async function GetStuStatus() {
-    return await axios.get("/api/class/auth/student-list")
-        .then(res=>{
-        return res.data
-    }).catch(err=>{
-        return console.log(err)
-        })
+export async function GetStuStatus() {//获取已签到或未签到的状态
+    return await request.get('/user/status')
+}
+export async function Login(loginData) {
+    const params = new URLSearchParams();
+    for(let key in loginData){
+        params.append(key,loginData[key])
+    }
+    return await request.post('/user/login',params)
 }

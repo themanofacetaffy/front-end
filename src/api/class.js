@@ -3,7 +3,7 @@ import axios from "axios";
 export  async function CallTheRoll(class_id) {
     return await axios.post("/api/call/auth/call-all-student", class_id)
         .then(res=>{
-            return console.log("点名发起成功")
+            return res.data
         }).catch(err=>{
             return console.log(err)
         })
