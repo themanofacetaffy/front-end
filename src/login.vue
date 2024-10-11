@@ -1,35 +1,53 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
-import {AddUser,Login} from '@/api/user'
+import {AddUser, Login, GetVerifyCode} from '@/api/user'
 import {useRouter} from "vue-router";
 import {UseTokenStore} from '@/stores/token.js'
-//const tokenStore = UseTokenStore()
+import {saveTokenForAccount1, saveTokenForAccount2} from '@/stores/cookie'
+
+const tokenStore = UseTokenStore()
 const router = useRouter()
 // do not use same name with ref
-const isRegister=ref(true)
-const LoginForm = ref({
+const isRegister = ref(true)
+const SubmitForm = ref({
   name: '',
-  stuNum:'',
-  PhoneNumber:'',
-  validation:'',
-  password:''
+  password: '',
+  student_number: '',
+  phone_number: '',
+  verify_code: ''
 })
+const VerifyCodeData = ref({
+  phone_number: '',
+})
+const LoginForm = ref({
+  phone_number: '',
+  password: ''
+})
+
 const radio1 = ref('1')//作为学生还是老师的判断
 
-const changeStatus = function (){
+const changeStatus = function () {
   isRegister.value = !isRegister.value;
 }
 
 const onSubmit = async () => {
-  await AddUser(LoginForm.value)
+  LoginForm.value.phone_number = SubmitForm.value.phone_number
+  LoginForm.value.password = SubmitForm.value.password
+  await AddUser(SubmitForm.value)
   isRegister.value = false
 }
 const login = async () => {
-  //let res = await Login()
-  //tokenStore.setToken(res.data.token)
-  if(radio1.value==='1'){
+  let res = await Login(LoginForm.value)
+  if (res.data.base.code !== 200) {
+    alert(res.data.base.msg)
+    return
+  }
+  tokenStore.setToken(res.data.token)
+  if (radio1.value === '1') {
+    //saveTokenForAccount1()
     await router.push('/stu')
-  }else{
+  } else {
+    //saveTokenForAccount2()
     await router.push('/tea')
   }
 
@@ -37,63 +55,67 @@ const login = async () => {
 
 const rules = {
   name: [
-    { required: true, message: '请输入姓名', trigger: 'blur' },
-    { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+    {required: true, message: '请输入姓名', trigger: 'blur'},
+    {min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur'}
   ],
   stuNum: [
-    { required: true, message: '请输入学号', trigger: 'blur' },
-    { min: 11, max:11 , message: '学号长度为11位', trigger: 'blur' }
+    {required: true, message: '请输入学号', trigger: 'blur'},
+    {min: 11, max: 11, message: '学号长度为11位', trigger: 'blur'}
   ],
   PhoneNumber: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { min: 11, max:11 , message: '手机号长度为11位', trigger: 'blur' }
+    {required: true, message: '请输入手机号', trigger: 'blur'},
+    {min: 11, max: 11, message: '手机号长度为11位', trigger: 'blur'}
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 15, message: '密码长度在6到15位之间', trigger: 'blur' }
+    {required: true, message: '请输入密码', trigger: 'blur'},
+    {min: 6, max: 15, message: '密码长度在6到15位之间', trigger: 'blur'}
   ],
   validation: [
-    { required: true, message: '请输入验证码', trigger: 'blur' },
-    { min: 4, max: 4, message: '验证码长度为4位', trigger: 'blur' }
+    {required: true, message: '请输入验证码', trigger: 'blur'},
+    {min: 4, max: 4, message: '验证码长度为4位', trigger: 'blur'}
   ]
+}
+const getVerifyCode = async () => {
+  VerifyCodeData.value.phone_number = SubmitForm.value.phone_number
+  await GetVerifyCode(VerifyCodeData.value)
 }
 </script>
 
 <template>
 
   <!-- 注册表单 -->
-  <div class="form-container" v-if="isRegister===true">
-    <el-form :model="LoginForm" label-width="auto" style="max-width: 600px" :rules="rules">
-      <el-form-item label="姓名"  prop="name">
-        <el-input v-model="LoginForm.name" />
+  <div v-if="isRegister===true" class="form-container">
+    <el-form :model="SubmitForm" :rules="rules" label-width="auto" style="max-width: 600px">
+      <el-form-item label="姓名" prop="name">
+        <el-input v-model="SubmitForm.name"/>
       </el-form-item>
       <el-form-item label="学号/工号" prop="stuNum">
-        <el-input v-model="LoginForm.stuNum" />
+        <el-input v-model="SubmitForm.student_number"/>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input v-model="LoginForm.password" />
+        <el-input v-model="SubmitForm.password"/>
       </el-form-item>
       <el-form-item label="手机号" prop="PhoneNumber">
-        <el-input v-model="LoginForm.PhoneNumber" />
+        <el-input v-model="SubmitForm.phone_number"/>
       </el-form-item>
       <div class="option">
         <div class="radio-group">
           <el-radio-group v-model="radio1">
-            <el-radio value="1" size="large" border>我是学生</el-radio>
-            <el-radio value="2" size="large" border>我是教师</el-radio>
+            <el-radio border size="large" value="1">我是学生</el-radio>
+            <el-radio border size="large" value="2">我是教师</el-radio>
           </el-radio-group>
         </div>
 
         <div class="validationCode">
           <el-form-item prop="validation">
-            <el-input placeholder="请输入验证码" v-model="LoginForm.validation" />
+            <el-input v-model="SubmitForm.verify_code" placeholder="请输入验证码"/>
           </el-form-item>
-          <el-button type="primary">获取验证码</el-button>
+          <el-button type="primary" @click="getVerifyCode">获取验证码</el-button>
         </div>
       </div>
 
       <div class="button">
-        <el-form-item >
+        <el-form-item>
           <el-button type="primary" @click="onSubmit">注册</el-button>
           <el-button @click="changeStatus">取消</el-button>
         </el-form-item>
@@ -103,18 +125,18 @@ const rules = {
   </div>
 
   <!-- 登录表单 -->
-  <div class="form-container" v-else>
+  <div v-else class="form-container">
     <el-form label-width="auto" style="max-width: 600px">
       <el-form-item label="手机号">
-        <el-input placeholder="请输入手机号" v-model="LoginForm.PhoneNumber"/>
+        <el-input v-model="LoginForm.phone_number" placeholder="请输入手机号"/>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input placeholder="请输入密码" type="password" v-model="LoginForm.password"/>
+        <el-input v-model="LoginForm.password" placeholder="请输入密码" type="password"/>
       </el-form-item>
       <div class="radio-group">
         <el-radio-group v-model="radio1">
-          <el-radio value="1" size="large" border>我是学生</el-radio>
-          <el-radio value="2" size="large" border>我是教师</el-radio>
+          <el-radio border size="large" value="1">我是学生</el-radio>
+          <el-radio border size="large" value="2">我是教师</el-radio>
         </el-radio-group>
       </div>
       <div class="button">

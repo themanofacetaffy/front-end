@@ -1,30 +1,43 @@
 import axios from "axios";
 import {UseTokenStore} from "@/stores/token.js";
+import router from "@/router";
 
 const baseURL = "/api";
-const instance = axios.create({ baseURL });
+const instance = axios.create({baseURL});
 instance.interceptors.request.use(
-    (config)=>{
-        const tokenStore = UseTokenStore()
-        if(tokenStore.token){
-            config.headers.Authorization = tokenStore.token
+    (req) => {
+        const useToken = UseTokenStore()
+
+        if (useToken.token !== null) {
+            req.headers.set("CallSystem-Token", useToken.token)
         }
-        return config
+        return req
     },
-    error=>{
+    error => {
         return Promise.reject(error)
     }
 )
 
+instance.interceptors.response.use(
+    result => {
+        console.log("ready to return")
+        if (result.data.base.code === 1000 || result.data.base.code === 1001 || result.data.base.code === 1002) {
 
-instance.interceptors.request.use(
-    result=>{
-        if(result.data.base.code===200){
-            return result.data
+            alert("请重新登录")
+            router.push('/login').then(() => {
+                console.log("路由已跳转");
+            });
+
         }
-        return Promise.reject(result.data)
+        if (result.data.base.code === 200) {
+
+            return result
+        }
+
+        return result
     },
-    error=>{
+    error => {
+
         return Promise.reject(error)
     }
 )
