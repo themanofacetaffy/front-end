@@ -58,7 +58,7 @@ const random_call_data = ref({
   call_number: 1,
   deadline: -1,
   call_event_name: '随机抽点',
-  action: 0
+  action: 2
 })
 const changePointData = ref({
   stu_uid: 0,
@@ -119,11 +119,30 @@ const Undo_call_events = async function () {
 
 
 const Random_call = async function () {
+  random_call_data.value.action = 2
   let msg02 = await random_call(random_call_data.value)
   randomData.value = msg02.data
   openRandom()
-
 }
+const Week_call = async function () {
+  random_call_data.value.action = 3
+  let msg02 = await random_call(random_call_data.value)
+  randomData.value = msg02.data
+  openRandom()
+}
+const Lucky_call = async function () {
+  random_call_data.value.action = 4
+  let msg02 = await random_call(random_call_data.value)
+  randomData.value = msg02.data
+  openRandom()
+}
+const Time_call = async function () {
+  random_call_data.value.action = 5
+  let msg02 = await random_call(random_call_data.value)
+  randomData.value = msg02.data
+  openRandom()
+}
+
 const changePoint = async function (value, student) {
   console.log("当前操作学生：", student)
   changePointData.value.point = value
@@ -169,7 +188,7 @@ const MinusPoint = async (student) => {
 }
 
 const openRandom = () => {
-  ElMessageBox.alert('学生姓名：' + randomData.value.users[0].name, '随机提问学生：', {
+  ElMessageBox.alert('学生姓名：' + randomData.value.users[0].name, '抽中学生：', {
     // if you want to disable its autofocus
     // autofocus: false,
     confirmButtonText: 'OK',
@@ -192,6 +211,9 @@ const openRandom = () => {
           <el-button type="primary" @click="CalltheRoll">发起签到</el-button>
           <el-button type="primary" @click="Undo_call_events">查看签到记录</el-button>
           <el-button type="primary" @click="Random_call">发起随机提问</el-button>
+          <el-button type="primary" @click="Week_call">发起星期点名</el-button>
+          <el-button type="primary" @click="Lucky_call">发起幸运数字点名</el-button>
+          <el-button type="primary" @click="Time_call">发起时间戳点名</el-button>
 
         </div>
         <hr>
